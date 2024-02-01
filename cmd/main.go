@@ -4,6 +4,10 @@ import (
 	"context"
 	"log/slog"
 	"net/http"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
 
 	storage "github.com/The-Gleb/EWallet/internal/adapter/db/postgres"
 	"github.com/The-Gleb/EWallet/internal/config"
@@ -17,6 +21,8 @@ import (
 	postgresql "github.com/The-Gleb/EWallet/pkg/client/postgres"
 	"github.com/go-chi/chi"
 )
+
+// https://github.com/The-Gleb/EWallet
 
 func main() {
 
@@ -57,6 +63,19 @@ func main() {
 		Handler: r,
 	}
 
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		ServerShutdownSignal := make(chan os.Signal, 1)
+		signal.Notify(ServerShutdownSignal, syscall.SIGINT)
+		<-ServerShutdownSignal
+		s.Shutdown(context.Background())
+		slog.Info("server shutdown")
+	}()
+
+	slog.Info("starting server")
 	if err := s.ListenAndServe(); err != nil {
 		slog.Error("error running server", "error", err)
 	}
