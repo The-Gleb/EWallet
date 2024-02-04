@@ -1,0 +1,34 @@
+version: '3.6'
+services:
+  emoney_db:
+      image: postgres:alpine
+      env_file:
+        - .env
+      environment:
+        - POSTGRES_USER=${POSTGRES_USER}
+        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      ports:
+        - "5434:5432"
+      volumes:
+        - postgres-db:/var/lib/postgresql/data
+  migrate:
+    image: migrate/migrate
+    depends_on:
+      - emoney_db
+    volumes:
+      - ./internal/adapter/db/postgres/migration:/migrations
+    command: ["-path", "/migrations/", "-database", "postgres://emoney:emoney@emoney_db:5432/emoney?sslmode=disable", "up"]
+  app:
+    build: .
+    volumes:
+      - .:/usr/src/app
+    environment:
+      - DB_HOST=emoney_db
+      - DB_PORT=5432
+    ports:
+      - "8080:8080"
+    command: go run cmd/main.go
+volumes:
+  postgres-db:
+# networks:
+#   emoney_network:

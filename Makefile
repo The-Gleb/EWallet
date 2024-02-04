@@ -1,5 +1,5 @@
 postgres:
-	docker run --name emoney_db -e POSTGRES_USER=emoney -e POSTGRES_PASSWORD=emoney -p 5434:5432 -d postgres
+	docker run --name emoney_db -e POSTGRES_USER=emoney -e POSTGRES_PASSWORD=emoney -p 5434:5432 -d postgres:alpine
 postgresrm:
 	docker stop emoney_db
 	docker rm emoney_db

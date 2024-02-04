@@ -1,13 +1,26 @@
-FROM golang:1.21
+FROM golang:1.21.3
 
-WORKDIR /ewallet
+WORKDIR /usr/src/app
 
 COPY . .
 
-RUN go get -d -v ./...
+# RUN go build -o ./bin/app cmd/main.go
 
-RUN go install -v ./...
+# ENTRYPOINT [ "go", "run", "cmd/main.go" ]
 
-EXPOSE 8080
+# RUN go install github.com/cosmtrek/air@latest
 
-CMD [ "ewallet" ]
+# RUN air init
+
+
+
+
+# EXPOSE 8080
+
+# RUN go get -u github.com/mattes/migrate
+
+# RUN make migrateup
+
+# RUN go build -o ewallet cmd/main.go
+
+# CMD [ "go run cmd/main.go" ]

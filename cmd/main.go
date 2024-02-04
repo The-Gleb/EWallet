@@ -58,8 +58,10 @@ func main() {
 	walletInfoHandler.AddToRouter(r)
 	txHistoryHandler.AddToRouter(r)
 
+	r.Get("/", RootHandler)
+
 	s := http.Server{
-		Addr:    "localhost:8080",
+		Addr:    cfg.RunAddress,
 		Handler: r,
 	}
 
@@ -75,9 +77,13 @@ func main() {
 		slog.Info("server shutdown")
 	}()
 
-	slog.Info("starting server")
+	slog.Info("starting server", "address", s.Addr)
 	if err := s.ListenAndServe(); err != nil {
 		slog.Error("error running server", "error", err)
 	}
 
+}
+
+func RootHandler(rw http.ResponseWriter, r *http.Request) {
+	rw.Write([]byte("hello"))
 }
